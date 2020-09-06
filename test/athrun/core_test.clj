@@ -1,7 +1,7 @@
 (ns athrun.core-test
   (:require
-    [clojure.test :refer [deftest is]]
     [athrun.core :as scheduler]
+    [clojure.test :refer [deftest is]]
     [com.stuartsierra.component :as component]))
 
 
