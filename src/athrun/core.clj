@@ -34,12 +34,13 @@
     (let [executor (ScheduledThreadPoolExecutor. 2)
           task-pool (->> scheduled-tasks
                          ;; wrap scheduled handler invocations so that we pass
-                         ;; the component instance
+                         ;; the component instance, but with required dependencies only
                          (mapv #(update % :handler (fn [original-handler]
-                                                     (fn [] (try
-                                                              (original-handler this)
-                                                              (catch Throwable err
-                                                                (log/errorf err "scheduled function error")))))))
+                                                     (fn []
+                                                       (try
+                                                         (original-handler (select-keys this (:dependencies %)))
+                                                         (catch Throwable err
+                                                           (log/errorf err "scheduled function error")))))))
                          (mapv #(schedule-task executor %)))]
       (log/infof "scheduler=%s executor=%s starting tasks=%s" name executor (count task-pool))
 
