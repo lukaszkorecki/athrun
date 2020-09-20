@@ -7,14 +7,20 @@
 
 (def tasks
   [{:name "fast"
+    :dependencies [:foo :state]
     :interval-seconds 1
-    :handler (fn [{:keys [state]}]
+    :handler (fn [{:keys [foo bar state]}]
+               (assert foo)
+               (assert (nil? bar))
                (swap! state #(update % :fast inc)))}
 
    {:name "slow"
+    :dependencies [:state :bar]
     :interval-seconds 2
     :delay-seconds 2
-    :handler (fn [{:keys [state]}]
+    :handler (fn [{:keys [foo bar state]}]
+               (assert bar)
+               (assert (nil? foo))
                (swap! state #(update % :slow inc)))}])
 
 
@@ -22,10 +28,12 @@
   (let [state  (atom {:fast 0 :slow 0})
         system  (component/map->SystemMap
                   {:state state
+                   :foo ::foo
+                   :bar ::bar
                    :scheduler (component/using
                                 (scheduler/create {:name "test"
                                                    :scheduled-tasks tasks})
-                                [:state])})]
+                                [:state :foo :bar])})]
     (is (= {:fast 0 :slow 0} @state))
     (let [running (component/start system)]
       (is (true? (:running (:scheduler running))))
