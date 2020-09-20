@@ -1,4 +1,4 @@
-(defproject athrun "0.0.1-SNAPSHOT"
+(defproject athrun "0.0.2-SNAPSHOT"
   :description "Scheduler component, based on ScheduledExecutor"
   :url "https://github.com/lukaszkorecki/athrun"
   :license {:name "Eclipse Public License"
