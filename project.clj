@@ -3,7 +3,12 @@
   :url "https://github.com/lukaszkorecki/athrun"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.10.1"]]
+  :dependencies [[org.clojure/clojure "1.10.1"]
+                 [com.cronutils/cron-utils "9.2.0"]
+                 [tick/tick  "0.5.0"
+                  :exclusions [cljs.java-time/cljs.java-time
+                               cljsjs/js-joda-locale-en-us
+                               cljsjs/js-joda-timezone]]]
   :deploy-repositories [["releases" :clojars]]
   :profiles {:dev {:dependencies [[nomnom/lockjaw "0.2.0-SNAPSHOT"]
                                   [org.slf4j/slf4j-api "1.7.30"]
