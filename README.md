@@ -5,15 +5,15 @@ Athrun Zala, pilot of ZGMF-X19A ∞ Justice Gundam.
 
 > Pun explaination: athRuns forever (infinite)
 
-Simple scheduler [Component](https://github.com/stuartsierra/component) based on `j.u.c.ScheduledThreadPoolExecutor`. Supports dependency injection, multiple scheduled tasks and second resolution for repeated execution.
+Simple scheduler [Component](https://github.com/stuartsierra/component) based on `j.u.c.ScheduledThreadPoolExecutor`. Supports dependency injection, multiple scheduled tasks and second resolution for repeated execution. Best of all, you can use cron expressions to configure when your handlers will execute.
 
-It's a spiritual successor to [nomnom/eternity](https://github.com/nomnom-insights/nomnom.eternity)
+It's a spiritual successor to [nomnom/eternity](https://github.com/nomnom-insights/nomnom.eternity) and very simplified version of QuartzScheduler.
 
 ## Installation
 
 
 ```clj
-[athrun "0.0.1"]
+[athrun "0.0.3-SNAPSHOT"] (unreleased)
 ```
 
 ## Usage
@@ -34,8 +34,7 @@ Each task requires the following:
 
 - handler - the scheduled function, receives a map of components it depends on
 - dependencies - **vector of keywords** to select from the scheduler component's deps
-- interval-seconds - how often run the function
-- delay-seconds - do not start the execution immediatedly, but wait X seconds before running the function for the first time. You can use this setting to model cron-like experssions when combined with `interval-seconds` (see below)
+- schedule - a Cron expression, with Quartz Scheduler extension allowing for specifying schedules down to a second (UNIX Cron can only schedule up to a minute)
 - name - name for logging
 
 Simple example:
@@ -45,17 +44,15 @@ Simple example:
   [{:name "inactive-accounts"
     ;; what does this task require?
     :dependencies [:publisher :redis]
-    ;; how often run this function?
-    :interval-seconds (* 15 60)
+    ;; run every 5m on 0th, 5th, 10th m of hour
+    :schedule "0 /5  * * * ?"
     :handler (fn [{:keys [publisher redis]}]
                (publisher :check-accounts (get-data-from redis)))}
    {:name "email-queue"
-    :interval-seconds 15
+    ;; 2am UTC
+    :schedule "0 0 2 * * *"
     ;; note that dependencies are pulled out of the scheduler component
     :dependencies [:publisher :db-conn]
-    ;; dealy the first run 30s after
-    ;; the component starts
-    :delay-seconds 30
     :handler (fn [{:keys [publisher db-conn]}]
                (store-results db-conn (publisher :send-emails)))}])
 
@@ -74,7 +71,7 @@ Simple example:
 
 Similarly to Eternity, middlewares are supported and VERY simple. There are two provided:
 
-- `athrun.middleware/with-lock` - based on [LockJaw](https://github.com/nomnom-insights/nomnom.lockjaw/)
+- `athrun.middleware/with-lock` - based on [LockJaw](https://github.com/nomnom-insights/nomnom.lockjaw/) require's `lock` component in the system and dependencies list
 
 - `athrun.middleware/with-logging` - simple logger based middleware, with DEBUG logs
 
@@ -98,13 +95,11 @@ and use it in your task definition.
 
 ## Roadmap
 
-- [ ] nail down the API
-- [ ] more middlewares?
 - [ ] better docs
+- [ ] more testing
 
 ## License
 
-Copyright © 2018 FIXME
+Copyright © 2018 - 2022 Lukasz Korecki
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
