@@ -4,6 +4,7 @@
 
 
 ;; XXX do we need tick at all?
+;; FIXME - just use JDK stuff directly, it's not that complciated
 
 (def now t/now)
 
