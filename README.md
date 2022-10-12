@@ -13,7 +13,7 @@ It's a spiritual successor to [nomnom/eternity](https://github.com/nomnom-insigh
 
 
 ```clj
-[athrun "0.0.3-SNAPSHOT"] (unreleased)
+[athrun "0.0.3-SNAPSHOT"]
 ```
 
 ## Usage
